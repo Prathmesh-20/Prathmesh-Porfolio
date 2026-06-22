@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { FaFilePdf } from "react-icons/fa";
 
 const Navbar = () => {
   return (
@@ -13,8 +14,11 @@ const Navbar = () => {
         <Link to="/contact" className="hover:text-cyan-400">Contact</Link>
         <Link to="/links" className="hover:text-cyan-400">Links</Link>
         <Link to="/skills" className="hover:text-cyan-400">Skills</Link>
+        
+        
       </div>
     </nav>
+    
   );
 };
 
