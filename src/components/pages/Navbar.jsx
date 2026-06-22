@@ -7,6 +7,7 @@ const Navbar = () => {
       <h1 className="text-2xl font-bold text-cyan-400"></h1>
 
       <div className="space-x-6">
+        <Link to="/" className="hover:text-cyan-400">Home</Link>
         <Link to="/about" className="hover:text-cyan-400">About</Link>
         <Link to="/projects" className="hover:text-cyan-400">Projects</Link>
         <Link to="/contact" className="hover:text-cyan-400">Contact</Link>
