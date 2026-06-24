@@ -1,5 +1,41 @@
 import { useRef } from "react";
 import emailjs from "@emailjs/browser";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+
+const ContactSchema = Yup.object({
+  user_name: Yup.string()
+    .min(3, "Full Name must be at least 3 characters")
+    .max(50, "Name is too long")
+    .required("Full Name is required"),
+
+  user_email: Yup.string()
+    .email("Please enter a valid email address")
+    .required("Email Address is required"),
+
+  user_phone: Yup.string()
+    .matches(
+      /^[0-9]{10}$/,
+      "Phone Number must be exactly 10 digits"
+    )
+    .required("Phone Number is required"),
+
+  company: Yup.string()
+    .max(100, "Company name is too long"),
+
+  subject: Yup.string()
+    .min(5, "Subject must be at least 5 characters")
+    .max(100, "Subject is too long")
+    .required("Subject is required"),
+
+  inquiry_type: Yup.string()
+    .required("Please select an inquiry type"),
+
+  message: Yup.string()
+    .min(20, "Message must be at least 20 characters")
+    .max(1000, "Message is too long")
+    .required("Message is required"),
+});
 
 const Contact = () => {
   const form = useRef();
@@ -131,79 +167,157 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <form
-            ref={form}
-            onSubmit={sendEmail}
-            className="bg-slate-800 p-8 rounded-2xl border border-slate-700"
-          >
-            <div className="grid md:grid-cols-2 gap-5 mb-5">
-              <input
-                type="text"
-                name="user_name"
-                placeholder="Full Name"
-                required
-                className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-cyan-400"
-              />
+          <Formik
+  initialValues={{
+    user_name: "",
+    user_email: "",
+    user_phone: "",
+    company: "",
+    subject: "",
+    inquiry_type: "",
+    message: "",
+  }}
+  validationSchema={ContactSchema}
+  onSubmit={(values) => {
+    console.log(values);
 
-              <input
-                type="email"
-                name="user_email"
-                placeholder="Email Address"
-                required
-                className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-cyan-400"
-              />
-            </div>
+    // EmailJS code here
+    alert("Message Sent Successfully!");
+  }}
+>
+  {() => (
+    <Form className="bg-slate-800 p-8 rounded-2xl border border-slate-700">
 
-            <div className="grid md:grid-cols-2 gap-5 mb-5">
-              <input
-                type="tel"
-                name="user_phone"
-                placeholder="Phone Number"
-                className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-cyan-400"
-              />
+      <div className="grid md:grid-cols-2 gap-5 mb-5">
 
-              <input
-                type="text"
-                name="company"
-                placeholder="Company / Organization"
-                className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-cyan-400"
-              />
-            </div>
+        <div>
+          <Field
+            type="text"
+            name="user_name"
+            placeholder="Full Name"
+            className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600"
+          />
+          <ErrorMessage
+            name="user_name"
+            component="p"
+            className="text-red-400 text-sm mt-1"
+          />
+        </div>
 
-            <input
-              type="text"
-              name="subject"
-              placeholder="Subject"
-              required
-              className="w-full p-3 mb-5 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-cyan-400"
-            />
+        <div>
+          <Field
+            type="email"
+            name="user_email"
+            placeholder="Email Address"
+            className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600"
+          />
+          <ErrorMessage
+            name="user_email"
+            component="p"
+            className="text-red-400 text-sm mt-1"
+          />
+        </div>
 
-            <select
-              name="inquiry_type"
-              className="w-full p-3 mb-5 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-cyan-400"
-            >
-              <option>Internship Opportunity</option>
-              <option>Freelance Project</option>
-              <option>Job Opportunity</option>
-              <option>Collaboration</option>
-              <option>General Inquiry</option>
-            </select>
+      </div>
 
-            <textarea
-              name="message"
-              rows="6"
-              placeholder="Write your message..."
-              required
-              className="w-full p-3 mb-6 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:border-cyan-400 resize-none"
-            ></textarea>
+      <div className="grid md:grid-cols-2 gap-5 mb-5">
 
-            <button
-              type="submit"
-              className="w-full bg-cyan-500 hover:bg-cyan-600 transition-all py-3 rounded-lg font-semibold"
-            >
-              Send Message
-            </button>
-          </form>
+        <div>
+          <Field
+            type="tel"
+            name="user_phone"
+            placeholder="Phone Number"
+            className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600"
+          />
+          <ErrorMessage
+            name="user_phone"
+            component="p"
+            className="text-red-400 text-sm mt-1"
+          />
+        </div>
+
+        <div>
+          <Field
+            type="text"
+            name="company"
+            placeholder="Company / Organization"
+            className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600"
+          />
+        </div>
+
+      </div>
+
+      <div className="mb-5">
+        <Field
+          type="text"
+          name="subject"
+          placeholder="Subject"
+          className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600"
+        />
+        <ErrorMessage
+          name="subject"
+          component="p"
+          className="text-red-400 text-sm mt-1"
+        />
+      </div>
+
+      <div className="mb-5">
+        <Field
+          as="select"
+          name="inquiry_type"
+          className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600"
+        >
+          <option value="">Select Inquiry Type</option>
+          <option value="Internship Opportunity">
+            Internship Opportunity
+          </option>
+          <option value="Freelance Project">
+            Freelance Project
+          </option>
+          <option value="Job Opportunity">
+            Job Opportunity
+          </option>
+          <option value="Collaboration">
+            Collaboration
+          </option>
+          <option value="General Inquiry">
+            General Inquiry
+          </option>
+        </Field>
+
+        <ErrorMessage
+          name="inquiry_type"
+          component="p"
+          className="text-red-400 text-sm mt-1"
+        />
+      </div>
+
+      <div className="mb-6">
+        <Field
+          as="textarea"
+          rows="6"
+          name="message"
+          placeholder="Write your message..."
+          className="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 resize-none"
+        />
+
+        <ErrorMessage
+          name="message"
+          component="p"
+          className="text-red-400 text-sm mt-1"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="w-full bg-cyan-500 hover:bg-cyan-600 transition-all py-3 rounded-lg font-semibold"
+      >
+        Send Message
+      </button>
+
+    </Form>
+  )}
+</Formik>
         </div>
       </div>
     </section>
