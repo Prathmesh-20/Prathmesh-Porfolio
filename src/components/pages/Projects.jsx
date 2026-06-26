@@ -38,7 +38,7 @@ const Projects = () => {
             </p>
             <div className="flex gap-3 mt-4">
   <a
-    href="https://real-estate-prathmesh4.vercel.app/"
+    href="https://real-estate-client-git-main-prathmesh4.vercel.app/"
     target="_blank"
     rel="noopener noreferrer"
     className="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600"
@@ -47,7 +47,7 @@ const Projects = () => {
   </a>
 
   <a
-    href="https://github.com/Prathmesh-20/Real-Estate"
+    href="https://github.com/Prathmesh-20?tab=repositories"
     target="_blank"
     rel="noopener noreferrer"
     className="px-4 py-2 border border-cyan-500 rounded-lg hover:bg-cyan-500"
