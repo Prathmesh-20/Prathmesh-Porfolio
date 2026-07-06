@@ -4,16 +4,17 @@ const Footer = () => {
   return (
     <footer className="bg-slate-900 py-6 border-t border-slate-700">
       <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        
         {/* Copyright */}
         <p className="text-gray-400 text-center md:text-left">
-          © 2026 <span className="text-cyan-400 font-semibold">Prathmesh Bhagwat</span>. All Rights Reserved.
+          © 2026{" "}
+          <span className="text-cyan-400 font-semibold">Prathmesh Bhagwat</span>
+          . All Rights Reserved.
         </p>
 
         {/* Social Icons */}
         <div className="flex items-center gap-5 text-xl">
           <a
-            href="https://github.com/your-github"
+            href="https://github.com/Prathmesh-20"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-cyan-400 transition duration-300"
@@ -22,7 +23,10 @@ const Footer = () => {
           </a>
 
           <a
-            href="https://linkedin.com/in/your-linkedin"
+            href="www.linkedin.com/in/
+prathmesh2010
+Vanity URL name
+"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-cyan-400 transition duration-300"
