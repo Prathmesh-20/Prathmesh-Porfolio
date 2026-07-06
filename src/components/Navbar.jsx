@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaBars, FaTimes, FaFilePdf } from "react-icons/fa";
+import { RiAdminFill } from "react-icons/ri";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,18 +9,13 @@ const Navbar = () => {
   return (
     <nav className="bg-slate-900 text-white sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-
         {/* Logo */}
-        <Link
-          to="/"
-          className="text-2xl font-bold text-cyan-400"
-        >
+        <Link to="/" className="text-2xl font-bold text-cyan-400">
           Prathmesh
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
-
           <Link to="/" className="hover:text-cyan-400 transition">
             Home
           </Link>
@@ -40,9 +36,21 @@ const Navbar = () => {
             Contact
           </Link>
 
-          <Link to="/links" className="hover:text-cyan-400 transition">
+          {/* <Link to="/links" className="hover:text-cyan-400 transition">
             Links
-          </Link>
+          </Link> */}
+
+
+
+          <Link
+  to="/admin"
+  className="text-cyan-400 hover:text-cyan-300 transition duration-300"
+  title="Admin Login"
+>
+  <RiAdminFill size={28} />
+</Link>
+
+
 
           {/* Resume Button */}
           {/* <a
@@ -68,7 +76,6 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-slate-800 px-6 pb-6 space-y-4">
-
           <Link
             to="/"
             onClick={() => setIsOpen(false)}

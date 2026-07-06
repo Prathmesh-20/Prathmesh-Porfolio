@@ -1,33 +1,45 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
-import Navbar from "./components/pages/Navbar";
-import Footer from "./components/pages/Footer";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 import Home from "./pages/Home";
-import About from "./components/pages/About";
-import Projects from "./components/pages/Projects";
-import Contact from "./components/pages/Contact";
-import Links from "./pages/Links";
+import About from "./pages/About";
+import Projects from "./pages/Projects";
 import Skills from "./pages/Skills";
+import Contact from "./pages/Contact";
+// import Links from "./pages/Links";
 
+import AdminLogin from "./pages/Admin-Login-Page/AdminLogin";
+import Dashboard from "./pages/Admin-Login-Page/Dashboard";
 
 function App() {
+  const location = useLocation();
+
+  const hideNavbar =
+    location.pathname === "/admin" ||
+    location.pathname === "/dashboard";
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-white">
-      <Navbar />
 
-      <main className="flex-grow">
+      {!hideNavbar && <Navbar />}
+
+      <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/projects" element={<Projects />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/links" element={<Links />} />
           <Route path="/skills" element={<Skills />} />
+          <Route path="/contact" element={<Contact />} />
+          {/* <Route path="/links" element={<Links />} /> */}
+
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </main>
 
-      <Footer />
+      {!hideNavbar && <Footer />}
     </div>
   );
 }
