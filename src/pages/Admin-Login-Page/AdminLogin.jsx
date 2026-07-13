@@ -1,120 +1,257 @@
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import { useNavigate } from "react-router-dom";
-import { FaEnvelope, FaLock } from "react-icons/fa";
-import * as Yup from "yup";
+import { useEffect, useState } from "react";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 
+export const adminSections = [
+  { to: "/dashboard", label: "Overview" },
+  { to: "/dashboard/home", label: "Home" },
+  { to: "/dashboard/about", label: "About" },
+  { to: "/dashboard/projects", label: "Projects" },
+  { to: "/dashboard/skills", label: "Skills" },
+  { to: "/dashboard/contact", label: "Contact" },
+  { to: "/dashboard/links", label: "Links" },
+];
 
-const LoginSchema = Yup.object({
-  email: Yup.string()
-    .email("Invalid email")
-    .required("Email is required"),
+function EditorPage({ title }) {
+  return (
+    <div style={{ padding: "20px", background: "#111827", color: "white", borderRadius: "10px" }}>
+      <h3>{title}</h3>
+      <p>This section is ready for editing.</p>
+    </div>
+  );
+}
 
-  password: Yup.string()
-    .min(6, "Minimum 6 characters")
-    .required("Password is required"),
-});
-
-const AdminLogin = () => {
+function AdminLogin() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
-  const initialValues = {
-    email: "",
-    password: "",
-  };
-
-  const handleSubmit = (values) => {
-    const adminEmail = "admin@gmail.com";
-    const adminPassword = "123456";
-
-    if (
-      values.email === adminEmail &&
-      values.password === adminPassword
-    ) {
-      localStorage.setItem("isAdmin", "true");
-      navigate("/dashboard");
-    } else {
-      alert("Invalid Credentials");
+  useEffect(() => {
+    if (localStorage.getItem("isAdmin") === "true") {
+      navigate("/dashboard", { replace: true });
     }
+  }, [navigate]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // no real credentials required
+    localStorage.setItem("isAdmin", "true");
+    navigate("/dashboard", { replace: true });
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex justify-center items-center px-5">
-      <div className="w-full max-w-md bg-slate-900 rounded-2xl shadow-2xl border border-cyan-500 p-8">
-
-        <h1 className="text-4xl font-bold text-center text-cyan-400 mb-2">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#020617",
+        color: "white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+      }}
+    >
+      <div
+        style={{
+          background: "#0f172a",
+          padding: "32px",
+          borderRadius: "16px",
+          width: "100%",
+          maxWidth: "420px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+        }}
+      >
+        <h2 style={{ fontSize: "28px", marginBottom: "8px", textAlign: "center" }}>
           Admin Login
-        </h1>
-
-        <p className="text-gray-400 text-center mb-8">
-          Login to access dashboard
+        </h2>
+        <p style={{ color: "#94a3b8", textAlign: "center", marginBottom: "24px" }}>
+          Sign in to access the dashboard
         </p>
 
-        <Formik
-          initialValues={initialValues}
-          validationSchema={LoginSchema}
+        <form
           onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "14px" }}
         >
-          <Form className="space-y-5">
+          <div>
+            <label style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="Enter email"
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "10px",
+                border: "1px solid #334155",
+                background: "#111827",
+                color: "white",
+                outline: "none",
+              }}
+            />
+          </div>
 
-            <div>
-              <label className="text-gray-300 block mb-2">
-                Email
-              </label>
+          <div>
+            <label style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
+              Password
+            </label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder="Enter password"
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "10px",
+                border: "1px solid #334155",
+                background: "#111827",
+                color: "white",
+                outline: "none",
+              }}
+            />
+          </div>
 
-              <div className="flex items-center bg-slate-800 rounded-lg border border-slate-700 px-3">
-                <FaEnvelope className="text-cyan-400" />
+          <button
+            type="submit"
+            style={{
+              marginTop: "8px",
+              padding: "12px",
+              borderRadius: "10px",
+              background: "#22d3ee",
+              color: "#0f172a",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "600",
+            }}
+          >
+            Login
+          </button>
 
-                <Field
-                  type="email"
-                  name="email"
-                  placeholder="Enter Email"
-                  className="w-full bg-transparent outline-none p-3 text-white"
-                />
-              </div>
-
-              <ErrorMessage
-                name="email"
-                component="div"
-                className="text-red-400 text-sm mt-1"
-              />
-            </div>
-
-            <div>
-              <label className="text-gray-300 block mb-2">
-                Password
-              </label>
-
-              <div className="flex items-center bg-slate-800 rounded-lg border border-slate-700 px-3">
-                <FaLock className="text-cyan-400" />
-
-                <Field
-                  type="password"
-                  name="password"
-                  placeholder="Enter Password"
-                  className="w-full bg-transparent outline-none p-3 text-white"
-                />
-              </div>
-
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="text-red-400 text-sm mt-1"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-cyan-500 hover:bg-cyan-600 transition-all duration-300 py-3 rounded-lg font-semibold text-black"
-            >
-              Login
-            </button>
-
-          </Form>
-        </Formik>
-
+          <p
+            style={{
+              textAlign: "center",
+              color: "#64748b",
+              fontSize: "13px",
+              marginTop: "6px",
+            }}
+          >
+            No credentials required — enter anything to continue
+          </p>
+        </form>
       </div>
     </div>
   );
-};
+}
+
+export function DashboardOverview() {
+  return (
+    <div>
+      <h2>Dashboard Overview</h2>
+      <p>Welcome to your admin dashboard.</p>
+    </div>
+  );
+}
+
+export function Dashboard() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentLabel =
+    adminSections.find((section) =>
+      location.pathname === section.to ||
+      (section.to !== "/dashboard" && location.pathname.startsWith(section.to))
+    )?.label || "Overview";
+
+  const handleLogout = () => {
+    localStorage.removeItem("isAdmin");
+    navigate("/admin", { replace: true });
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#020617", color: "white", padding: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <h2>Dashboard - {currentLabel}</h2>
+        <button
+          onClick={handleLogout}
+          style={{ padding: "8px 12px", borderRadius: "6px", cursor: "pointer" }}
+        >
+          Logout
+        </button>
+      </div>
+
+      <div style={{ display: "flex", gap: "20px" }}>
+        <div
+          style={{
+            width: "220px",
+            background: "#111827",
+            padding: "15px",
+            borderRadius: "10px",
+          }}
+        >
+          {adminSections.map((section) => (
+            <div
+              key={section.to}
+              onClick={() => navigate(section.to)}
+              style={{
+                padding: "8px 10px",
+                marginBottom: "8px",
+                borderRadius: "6px",
+                background: location.pathname === section.to ? "#0f766e" : "#1f2937",
+                cursor: "pointer",
+              }}
+            >
+              {section.label}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function HomeEditor() {
+  return <EditorPage title="Home Editor" />;
+}
+
+export function AboutEditor() {
+  return <EditorPage title="About Editor" />;
+}
+
+export function ProjectsEditor() {
+  return <EditorPage title="Projects Editor" />;
+}
+
+export function SkillsEditor() {
+  return <EditorPage title="Skills Editor" />;
+}
+
+export function ContactEditor() {
+  return <EditorPage title="Contact Editor" />;
+}
+
+export function LinksEditor() {
+  return <EditorPage title="Links Editor" />;
+}
+
+export function ProtectedRoute({ children }) {
+  if (localStorage.getItem("isAdmin") !== "true") {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return children;
+}
 
 export default AdminLogin;

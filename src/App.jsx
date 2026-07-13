@@ -8,21 +8,28 @@ import About from "./pages/About";
 import Projects from "./pages/Projects";
 import Skills from "./pages/Skills";
 import Contact from "./pages/Contact";
-// import Links from "./pages/Links";
 
-import AdminLogin from "./pages/Admin-Login-Page/AdminLogin";
-import Dashboard from "./pages/Admin-Login-Page/Dashboard";
+import AdminLogin, {
+  Dashboard,
+  DashboardOverview,
+  HomeEditor,
+  AboutEditor,
+  ProjectsEditor,
+  SkillsEditor,
+  ContactEditor,
+  LinksEditor,
+  ProtectedRoute,
+} from "./pages/Admin-Login-Page/AdminLogin";
 
 function App() {
   const location = useLocation();
 
   const hideNavbar =
-    location.pathname === "/admin" ||
-    location.pathname === "/dashboard";
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/dashboard");
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-white">
-
       {!hideNavbar && <Navbar />}
 
       <main className="flex-1">
@@ -32,10 +39,25 @@ function App() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/skills" element={<Skills />} />
           <Route path="/contact" element={<Contact />} />
-          {/* <Route path="/links" element={<Links />} /> */}
 
           <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DashboardOverview />} />
+            <Route path="home" element={<HomeEditor />} />
+            <Route path="about" element={<AboutEditor />} />
+            <Route path="projects" element={<ProjectsEditor />} />
+            <Route path="skills" element={<SkillsEditor />} />
+            <Route path="contact" element={<ContactEditor />} />
+            <Route path="links" element={<LinksEditor />} />
+          </Route>
         </Routes>
       </main>
 
