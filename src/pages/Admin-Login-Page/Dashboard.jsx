@@ -8,7 +8,6 @@ import {
   FaProjectDiagram,
   FaTools,
   FaEnvelope,
-  FaLink,
   FaSignOutAlt,
   FaUserShield,
 } from "react-icons/fa";
@@ -29,7 +28,6 @@ const Dashboard = () => {
     { title: "Edit Projects", icon: <FaProjectDiagram />, path: "/dashboard/projects" },
     { title: "Edit Skills", icon: <FaTools />, path: "/dashboard/skills" },
     { title: "Edit Contact", icon: <FaEnvelope />, path: "/dashboard/contact" },
-    { title: "Edit Links", icon: <FaLink />, path: "/dashboard/links" },
   ];
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);

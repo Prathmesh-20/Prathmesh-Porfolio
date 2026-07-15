@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { LoginSchema } from "../../validation/LoginSchema";
 
 export const adminSections = [
-  { to: "/dashboard", label: "Overview" },
+  { to: "/dashboard", label: "Home" },
   { to: "/dashboard/home", label: "Home" },
   { to: "/dashboard/about", label: "About" },
   { to: "/dashboard/projects", label: "Projects" },
   { to: "/dashboard/skills", label: "Skills" },
   { to: "/dashboard/contact", label: "Contact" },
-  { to: "/dashboard/links", label: "Links" },
 ];
 
 function EditorPage({ title }) {
@@ -22,21 +23,10 @@ function EditorPage({ title }) {
 
 function AdminLogin() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
 
   useEffect(() => {
-    if (localStorage.getItem("isAdmin") === "true") {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [navigate]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // no real credentials required
-    localStorage.setItem("isAdmin", "true");
-    navigate("/dashboard", { replace: true });
-  };
+    localStorage.removeItem("isAdmin");
+  }, []);
 
   return (
     <div
@@ -67,79 +57,100 @@ function AdminLogin() {
           Sign in to access the dashboard
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "14px" }}
+        <Formik
+          initialValues={{ email: "", password: "" }}
+          validationSchema={LoginSchema}
+          onSubmit={(values, { setSubmitting }) => {
+            localStorage.setItem("isAdmin", "true");
+            setSubmitting(false);
+            navigate("/dashboard", { replace: true });
+          }}
         >
-          <div>
-            <label style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="Enter email"
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #334155",
-                background: "#111827",
-                color: "white",
-                outline: "none",
-              }}
-            />
-          </div>
+          {({ errors, touched, isSubmitting }) => (
+            <Form style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div>
+                <label htmlFor="email" style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
+                  Email
+                </label>
+                <Field
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter email"
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    borderRadius: "10px",
+                    border: `1px solid ${errors.email && touched.email ? "#f87171" : "#334155"}`,
+                    background: "#111827",
+                    color: "white",
+                    outline: "none",
+                  }}
+                />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  style={{ color: "#f87171", fontSize: "12px", marginTop: "6px" }}
+                />
+              </div>
 
-          <div>
-            <label style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
-              Password
-            </label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="Enter password"
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #334155",
-                background: "#111827",
-                color: "white",
-                outline: "none",
-              }}
-            />
-          </div>
+              <div>
+                <label htmlFor="password" style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
+                  Password
+                </label>
+                <Field
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter password"
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    borderRadius: "10px",
+                    border: `1px solid ${errors.password && touched.password ? "#f87171" : "#334155"}`,
+                    background: "#111827",
+                    color: "white",
+                    outline: "none",
+                  }}
+                />
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  style={{ color: "#f87171", fontSize: "12px", marginTop: "6px" }}
+                />
+              </div>
 
-          <button
-            type="submit"
-            style={{
-              marginTop: "8px",
-              padding: "12px",
-              borderRadius: "10px",
-              background: "#22d3ee",
-              color: "#0f172a",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: "600",
-            }}
-          >
-            Login
-          </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  marginTop: "8px",
+                  padding: "12px",
+                  borderRadius: "10px",
+                  background: "#22d3ee",
+                  color: "#0f172a",
+                  border: "none",
+                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                  fontWeight: "600",
+                  opacity: isSubmitting ? 0.7 : 1,
+                }}
+              >
+                {isSubmitting ? "Signing in..." : "Login"}
+              </button>
 
-          <p
-            style={{
-              textAlign: "center",
-              color: "#64748b",
-              fontSize: "13px",
-              marginTop: "6px",
-            }}
-          >
-            No credentials required — enter anything to continue
-          </p>
-        </form>
+              <p
+                style={{
+                  textAlign: "center",
+                  color: "#64748b",
+                  fontSize: "13px",
+                  marginTop: "6px",
+                }}
+              >
+                No credentials required — enter anything to continue
+              </p>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );

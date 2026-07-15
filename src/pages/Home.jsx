@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import profile from "../assets/profile.jpeg";
+import defaultProfile from "../assets/profile.jpeg";
 import { FaArrowRight } from "react-icons/fa";
 import { useContent } from "../context/ContentContext";
 
@@ -106,13 +106,13 @@ const Home = () => {
               <div className="absolute inset-0 rounded-full bg-cyan-500 blur-3xl opacity-30 animate-pulse"></div>
 
               <img
-                src={profile}
+                src={home.profileImage && home.profileImage.trim() ? home.profileImage : defaultProfile}
                 alt="Profile"
                 className="relative w-80 h-80 md:w-96 md:h-96 object-cover rounded-full border-4 border-cyan-500 shadow-2xl hover:scale-105 transition duration-500"
               />
 
             </div>
-
+              
           </div>
 
         </div>

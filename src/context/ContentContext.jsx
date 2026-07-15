@@ -13,6 +13,7 @@ const defaultContent = {
     description:
       "Passionate about developing modern web applications, learning new technologies, and solving real-world problems using React, Python, Java, Django, Machine Learning and modern frontend technologies.",
     buttonText: "View Projects",
+    profileImage: "",
   },
   about: {
     heading: "About Me",

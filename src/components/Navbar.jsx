@@ -14,63 +14,61 @@ const Navbar = () => {
           Prathmesh
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="hover:text-cyan-400 transition">
-            Home
-          </Link>
+        <div className="flex items-center gap-3">
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link to="/" className="hover:text-cyan-400 transition">
+              Home
+            </Link>
 
-          <Link to="/about" className="hover:text-cyan-400 transition">
-            About
-          </Link>
+            <Link to="/about" className="hover:text-cyan-400 transition">
+              About
+            </Link>
 
-          <Link to="/projects" className="hover:text-cyan-400 transition">
-            Projects
-          </Link>
+            <Link to="/projects" className="hover:text-cyan-400 transition">
+              Projects
+            </Link>
 
-          <Link to="/skills" className="hover:text-cyan-400 transition">
-            Skills
-          </Link>
+            <Link to="/skills" className="hover:text-cyan-400 transition">
+              Skills
+            </Link>
 
-          <Link to="/contact" className="hover:text-cyan-400 transition">
-            Contact
-          </Link>
+            <Link to="/contact" className="hover:text-cyan-400 transition">
+              Contact
+            </Link>
 
-          {/* <Link to="/links" className="hover:text-cyan-400 transition">
-            Links
-          </Link> */}
+            {/* <Link to="/links" className="hover:text-cyan-400 transition">
+              Links
+            </Link> */}
 
+            <Link
+              to="/admin"
+              className="text-cyan-400 hover:text-cyan-300 transition duration-300"
+              title="Admin Login"
+            >
+              <RiAdminFill size={28} />
+            </Link>
 
+            {/* Resume Button */}
+            {/* <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
+            >
+              <FaFilePdf />
+              Resume
+            </a> */}
+          </div>
 
-          <Link
-  to="/admin"
-  className="text-cyan-400 hover:text-cyan-300 transition duration-300"
-  title="Admin Login"
->
-  <RiAdminFill size={28} />
-</Link>
-
-
-
-          {/* Resume Button */}
-          {/* <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
+          {/* Mobile Hamburger */}
+          <button
+            className="md:hidden text-3xl"
+            onClick={() => setIsOpen(!isOpen)}
           >
-            <FaFilePdf />
-            Resume
-          </a> */}
+            {isOpen ? <FaTimes /> : <FaBars />}
+          </button>
         </div>
-
-        {/* Mobile Hamburger */}
-        <button
-          className="md:hidden text-3xl"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <FaTimes /> : <FaBars />}
-        </button>
       </div>
 
       {/* Mobile Menu */}
@@ -122,6 +120,15 @@ const Navbar = () => {
             className="block hover:text-cyan-400"
           >
             Links
+          </Link>
+
+          <Link
+            to="/admin"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition"
+          >
+            <RiAdminFill size={20} />
+            <span>Admin</span>
           </Link>
         </div>
       )}
