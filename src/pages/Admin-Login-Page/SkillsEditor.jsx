@@ -1,76 +1,47 @@
-// src/pages/Admin-Login-Page/SkillsEditor.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useContent } from "../../context/ContentContext";
 
 const SkillsEditor = () => {
-  // Initial state (replace with API data later if needed)
-  const [skills, setSkills] = useState(["React", "Tailwind CSS", "Node.js"]);
+  const { content, updateSection } = useContent();
+  const [skills, setSkills] = useState(content.skills);
   const [newSkill, setNewSkill] = useState("");
 
-  // Add new skill
+  useEffect(() => {
+    setSkills(content.skills);
+  }, [content.skills]);
+
   const addSkill = () => {
-    if (newSkill.trim() !== "") {
-      setSkills([...skills, newSkill]);
-      setNewSkill("");
-    }
+    const value = newSkill.trim();
+    if (!value) return;
+    setSkills((prev) => [...prev, { id: Date.now(), name: value }]);
+    setNewSkill("");
   };
 
-  // Delete skill
-  const deleteSkill = (index) => {
-    setSkills(skills.filter((_, i) => i !== index));
+  const deleteSkill = (id) => {
+    setSkills((prev) => prev.filter((skill) => skill.id !== id));
   };
 
-  // Save handler (replace with API call or DB update)
   const handleSave = () => {
-    console.log("Saved Skills:", skills);
+    updateSection("skills", skills);
     alert("Skills updated successfully!");
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-slate-900 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Edit Skills</h2>
-
-      {/* Add New Skill */}
-      <div className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={newSkill}
-          onChange={(e) => setNewSkill(e.target.value)}
-          placeholder="Enter a new skill"
-          className="flex-1 px-3 py-2 rounded bg-slate-800 text-white border border-cyan-400"
-        />
-        <button
-          onClick={addSkill}
-          className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded font-semibold transition"
-        >
-          Add
-        </button>
+    <div className="mx-auto max-w-3xl rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-cyan-500/10">
+      <h2 className="mb-6 text-2xl font-bold text-cyan-400">Edit Skills</h2>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+        <input value={newSkill} onChange={(e) => setNewSkill(e.target.value)} placeholder="Enter a new skill" className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0" />
+        <button onClick={addSkill} className="rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400">Add</button>
       </div>
-
-      {/* Skills List */}
-      <ul className="space-y-2">
-        {skills.map((skill, index) => (
-          <li
-            key={index}
-            className="flex justify-between items-center bg-slate-800 px-4 py-2 rounded"
-          >
-            <span>{skill}</span>
-            <button
-              onClick={() => deleteSkill(index)}
-              className="text-red-400 hover:text-red-600"
-            >
-              Delete
-            </button>
-          </li>
+      <div className="space-y-2">
+        {skills.map((skill) => (
+          <div key={skill.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/70 px-4 py-3">
+            <span className="text-slate-200">{skill.name}</span>
+            <button onClick={() => deleteSkill(skill.id)} className="text-sm font-medium text-red-400 transition hover:text-red-300">Delete</button>
+          </div>
         ))}
-      </ul>
-
-      {/* Save Button */}
-      <button
-        onClick={handleSave}
-        className="mt-6 bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded font-semibold transition"
-      >
-        Save Changes
-      </button>
+      </div>
+      <button onClick={handleSave} className="mt-6 rounded-lg bg-cyan-500 px-6 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400">Save Changes</button>
     </div>
   );
 };

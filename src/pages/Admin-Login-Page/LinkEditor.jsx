@@ -1,101 +1,50 @@
-// src/pages/Admin-Login-Page/LinksEditor.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useContent } from "../../context/ContentContext";
 
 const LinksEditor = () => {
-  // Initial state (replace with API data later if needed)
-  const [links, setLinks] = useState([
-    { platform: "GitHub", url: "https://github.com/yourusername" },
-    { platform: "LinkedIn", url: "https://linkedin.com/in/yourusername" },
-  ]);
+  const { content, updateSection } = useContent();
+  const [links, setLinks] = useState(content.links);
+  const [newLink, setNewLink] = useState({ platform: "", url: "" });
 
-  const [newPlatform, setNewPlatform] = useState("");
-  const [newUrl, setNewUrl] = useState("");
+  useEffect(() => {
+    setLinks(content.links);
+  }, [content.links]);
 
-  // Add new link
   const addLink = () => {
-    if (newPlatform.trim() !== "" && newUrl.trim() !== "") {
-      setLinks([...links, { platform: newPlatform, url: newUrl }]);
-      setNewPlatform("");
-      setNewUrl("");
-    }
+    if (!newLink.platform.trim() || !newLink.url.trim()) return;
+    setLinks((prev) => [...prev, { platform: newLink.platform.trim(), url: newLink.url.trim() }]);
+    setNewLink({ platform: "", url: "" });
   };
 
-  // Delete link
   const deleteLink = (index) => {
-    setLinks(links.filter((_, i) => i !== index));
+    setLinks((prev) => prev.filter((_, linkIndex) => linkIndex !== index));
   };
 
-  // Save handler (replace with API call or DB update)
   const handleSave = () => {
-    console.log("Saved Links:", links);
+    updateSection("links", links);
     alert("Links updated successfully!");
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-slate-900 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Edit Links</h2>
-
-      {/* Add New Link */}
-      <div className="mb-6 space-y-3">
-        <input
-          type="text"
-          value={newPlatform}
-          onChange={(e) => setNewPlatform(e.target.value)}
-          placeholder="Platform (e.g., GitHub, LinkedIn)"
-          className="w-full px-3 py-2 rounded bg-slate-800 text-white border border-cyan-400"
-        />
-        <input
-          type="url"
-          value={newUrl}
-          onChange={(e) => setNewUrl(e.target.value)}
-          placeholder="URL (e.g., https://...)"
-          className="w-full px-3 py-2 rounded bg-slate-800 text-white border border-cyan-400"
-        />
-        <button
-          onClick={addLink}
-          className="bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded font-semibold transition"
-        >
-          Add Link
-        </button>
+    <div className="mx-auto max-w-3xl rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-cyan-500/10">
+      <h2 className="mb-6 text-2xl font-bold text-cyan-400">Edit Links</h2>
+      <div className="mb-6 space-y-3 rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+        <input value={newLink.platform} onChange={(e) => setNewLink((prev) => ({ ...prev, platform: e.target.value }))} placeholder="Platform (e.g. GitHub)" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0" />
+        <input type="url" value={newLink.url} onChange={(e) => setNewLink((prev) => ({ ...prev, url: e.target.value }))} placeholder="URL (e.g. https://...)" className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0" />
+        <button onClick={addLink} className="rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400">Add Link</button>
       </div>
-
-      {/* Links List */}
-      <ul className="space-y-4">
+      <div className="space-y-3">
         {links.map((link, index) => (
-          <li
-            key={index}
-            className="bg-slate-800 p-4 rounded flex justify-between items-center"
-          >
+          <div key={`${link.platform}-${index}`} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/70 px-4 py-3">
             <div>
-              <h3 className="text-lg font-semibold text-cyan-300">
-                {link.platform}
-              </h3>
-              <a
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-300 hover:text-cyan-400"
-              >
-                {link.url}
-              </a>
+              <h3 className="font-semibold text-cyan-300">{link.platform}</h3>
+              <a href={link.url} target="_blank" rel="noreferrer" className="text-sm text-slate-400 hover:text-cyan-300">{link.url}</a>
             </div>
-            <button
-              onClick={() => deleteLink(index)}
-              className="text-red-400 hover:text-red-600 ml-4"
-            >
-              Delete
-            </button>
-          </li>
+            <button onClick={() => deleteLink(index)} className="text-sm font-medium text-red-400 transition hover:text-red-300">Delete</button>
+          </div>
         ))}
-      </ul>
-
-      {/* Save Button */}
-      <button
-        onClick={handleSave}
-        className="mt-6 bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded font-semibold transition"
-      >
-        Save Changes
-      </button>
+      </div>
+      <button onClick={handleSave} className="mt-6 rounded-lg bg-cyan-500 px-6 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400">Save Changes</button>
     </div>
   );
 };

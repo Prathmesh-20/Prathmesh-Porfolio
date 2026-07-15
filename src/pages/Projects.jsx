@@ -1,30 +1,9 @@
-const projects = [
-  {
-    title: "Real Estate Website",
-    description:
-      "A responsive real estate web application built using React, Tailwind CSS, and EmailJS. It features property listings, contact functionality, responsive design, and a modern user interface.",
-    liveLink: "https://real-estate-client-git-main-prathmesh4.vercel.app/",
-    githubLink: "https://github.com/Prathmesh-20",
-  },
-
-  {
-    title: "Digital Marketing Agency",
-    description:
-      "A business website showcasing digital marketing services, company information, contact form, and responsive UI built using React and Tailwind CSS.",
-    liveLink: "",
-    githubLink: "",
-  },
-
-  {
-    title: "Online Exam System",
-    description:
-      "A web-based examination platform with student and admin modules, quiz management, and result generation.",
-    liveLink: "",
-    githubLink: "",
-  },
-];
+import { useContent } from "../context/ContentContext";
 
 const Projects = () => {
+  const { content } = useContent();
+  const projects = content.projects;
+
   return (
     <section
       id="projects"

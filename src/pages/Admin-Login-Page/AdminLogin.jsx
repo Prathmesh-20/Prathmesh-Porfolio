@@ -147,103 +147,11 @@ function AdminLogin() {
 
 export function DashboardOverview() {
   return (
-    <div>
-      <h2>Dashboard Overview</h2>
-      <p>Welcome to your admin dashboard.</p>
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-cyan-500/10">
+      <h2 className="text-2xl font-semibold text-cyan-400">Dashboard Overview</h2>
+      <p className="mt-2 text-slate-400">Welcome to your admin dashboard. Select a section on the left to start editing your portfolio content.</p>
     </div>
   );
-}
-
-export function Dashboard() {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const currentLabel =
-    adminSections.find((section) =>
-      location.pathname === section.to ||
-      (section.to !== "/dashboard" && location.pathname.startsWith(section.to))
-    )?.label || "Overview";
-
-  const handleLogout = () => {
-    localStorage.removeItem("isAdmin");
-    navigate("/admin", { replace: true });
-  };
-
-  return (
-    <div style={{ minHeight: "100vh", background: "#020617", color: "white", padding: "20px" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <h2>Dashboard - {currentLabel}</h2>
-        <button
-          onClick={handleLogout}
-          style={{ padding: "8px 12px", borderRadius: "6px", cursor: "pointer" }}
-        >
-          Logout
-        </button>
-      </div>
-
-      <div style={{ display: "flex", gap: "20px" }}>
-        <div
-          style={{
-            width: "220px",
-            background: "#111827",
-            padding: "15px",
-            borderRadius: "10px",
-          }}
-        >
-          {adminSections.map((section) => (
-            <div
-              key={section.to}
-              onClick={() => navigate(section.to)}
-              style={{
-                padding: "8px 10px",
-                marginBottom: "8px",
-                borderRadius: "6px",
-                background: location.pathname === section.to ? "#0f766e" : "#1f2937",
-                cursor: "pointer",
-              }}
-            >
-              {section.label}
-            </div>
-          ))}
-        </div>
-
-        <div style={{ flex: 1 }}>
-          <Outlet />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function HomeEditor() {
-  return <EditorPage title="Home Editor" />;
-}
-
-export function AboutEditor() {
-  return <EditorPage title="About Editor" />;
-}
-
-export function ProjectsEditor() {
-  return <EditorPage title="Projects Editor" />;
-}
-
-export function SkillsEditor() {
-  return <EditorPage title="Skills Editor" />;
-}
-
-export function ContactEditor() {
-  return <EditorPage title="Contact Editor" />;
-}
-
-export function LinksEditor() {
-  return <EditorPage title="Links Editor" />;
 }
 
 export function ProtectedRoute({ children }) {

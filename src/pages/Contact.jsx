@@ -2,6 +2,7 @@ import { useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useContent } from "../context/ContentContext";
 
 const ContactSchema = Yup.object({
   user_name: Yup.string()
@@ -34,6 +35,8 @@ const ContactSchema = Yup.object({
 
 const Contact = () => {
   const form = useRef();
+  const { content } = useContent();
+  const contact = content.contact;
   const serviceId =
     import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_jt55uye";
   const templateId =
@@ -117,29 +120,26 @@ const Contact = () => {
               <div>
                 <h4 className="text-cyan-400 font-medium">Email</h4>
                 <a
-                  href="mailto:bhagwatp853@gmail.com"
+                  href={`mailto:${contact.email}`}
                   className="text-gray-300 hover:text-cyan-400"
                 >
-                  bhagwatp853@gmail.com
+                  {contact.email}
                 </a>
               </div>
 
               <div>
                 <h4 className="text-cyan-400 font-medium">Phone</h4>
-                <p className="text-gray-300">+91 6354136921</p>
+                <p className="text-gray-300">{contact.phone}</p>
               </div>
 
               <div>
                 <h4 className="text-cyan-400 font-medium">Location</h4>
-                <p className="text-gray-300">Ahmedabad, Gujarat, India</p>
+                <p className="text-gray-300">{contact.address}</p>
               </div>
 
               <div>
                 <h4 className="text-cyan-400 font-medium">Availability</h4>
-                <p className="text-gray-300">
-                  Open for internships, freelance projects, collaborations, and
-                  full-time opportunities.
-                </p>
+                <p className="text-gray-300">{contact.availability}</p>
               </div>
             </div>
           </div>

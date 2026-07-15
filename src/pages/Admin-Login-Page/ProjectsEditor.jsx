@@ -1,89 +1,137 @@
-// src/pages/Admin-Login-Page/ProjectsEditor.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useContent } from "../../context/ContentContext";
 
 const ProjectsEditor = () => {
-  // Initial state (replace with API data later if needed)
-  const [projects, setProjects] = useState([
-    { title: "Portfolio Website", description: "A personal portfolio built with React and Tailwind CSS." },
-    { title: "Google Keep Clone", description: "A note-taking app with CRUD functionality." },
-  ]);
+  const { content, updateSection } = useContent();
+  const [projects, setProjects] = useState(content.projects);
+  const [newProject, setNewProject] = useState({
+    title: "",
+    description: "",
+    liveLink: "",
+    githubLink: "",
+  });
 
-  const [newTitle, setNewTitle] = useState("");
-  const [newDescription, setNewDescription] = useState("");
+  useEffect(() => {
+    setProjects(content.projects);
+  }, [content.projects]);
 
-  // Add new project
   const addProject = () => {
-    if (newTitle.trim() !== "" && newDescription.trim() !== "") {
-      setProjects([...projects, { title: newTitle, description: newDescription }]);
-      setNewTitle("");
-      setNewDescription("");
-    }
+    if (!newProject.title.trim() || !newProject.description.trim()) return;
+
+    setProjects((prev) => [
+      ...prev,
+      {
+        title: newProject.title.trim(),
+        description: newProject.description.trim(),
+        liveLink: newProject.liveLink.trim(),
+        githubLink: newProject.githubLink.trim(),
+      },
+    ]);
+    setNewProject({ title: "", description: "", liveLink: "", githubLink: "" });
   };
 
-  // Delete project
+  const updateProject = (index, field, value) => {
+    setProjects((prev) =>
+      prev.map((project, projectIndex) =>
+        projectIndex === index ? { ...project, [field]: value } : project
+      )
+    );
+  };
+
   const deleteProject = (index) => {
-    setProjects(projects.filter((_, i) => i !== index));
+    setProjects((prev) => prev.filter((_, projectIndex) => projectIndex !== index));
   };
 
-  // Save handler (replace with API call or DB update)
   const handleSave = () => {
-    console.log("Saved Projects:", projects);
+    updateSection("projects", projects);
     alert("Projects updated successfully!");
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-slate-900 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Edit Projects</h2>
+    <div className="mx-auto max-w-4xl rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-cyan-500/10">
+      <h2 className="mb-6 text-2xl font-bold text-cyan-400">Edit Projects</h2>
 
-      {/* Add New Project */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Project Title"
-          className="w-full mb-3 px-3 py-2 rounded bg-slate-800 text-white border border-cyan-400"
-        />
-        <textarea
-          value={newDescription}
-          onChange={(e) => setNewDescription(e.target.value)}
-          placeholder="Project Description"
-          rows="3"
-          className="w-full mb-3 px-3 py-2 rounded bg-slate-800 text-white border border-cyan-400"
-        />
+      <div className="mb-6 rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+        <div className="grid gap-3 md:grid-cols-2">
+          <input
+            value={newProject.title}
+            onChange={(e) => setNewProject((prev) => ({ ...prev, title: e.target.value }))}
+            placeholder="Project Title"
+            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+          />
+          <input
+            value={newProject.liveLink}
+            onChange={(e) => setNewProject((prev) => ({ ...prev, liveLink: e.target.value }))}
+            placeholder="Live URL"
+            className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+          />
+          <textarea
+            value={newProject.description}
+            onChange={(e) => setNewProject((prev) => ({ ...prev, description: e.target.value }))}
+            rows="3"
+            placeholder="Project Description"
+            className="md:col-span-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+          />
+          <input
+            value={newProject.githubLink}
+            onChange={(e) => setNewProject((prev) => ({ ...prev, githubLink: e.target.value }))}
+            placeholder="GitHub URL"
+            className="md:col-span-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+          />
+        </div>
         <button
           onClick={addProject}
-          className="bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded font-semibold transition"
+          className="mt-4 rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400"
         >
           Add Project
         </button>
       </div>
 
-      {/* Project List */}
-      <ul className="space-y-4">
+      <div className="space-y-4">
         {projects.map((project, index) => (
-          <li
-            key={index}
-            className="bg-slate-800 p-4 rounded flex justify-between items-start"
-          >
-            <div>
-              <h3 className="text-lg font-semibold text-cyan-300">{project.title}</h3>
-              <p className="text-gray-300">{project.description}</p>
+          <div key={`${project.title}-${index}`} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 space-y-3">
+                <input
+                  value={project.title}
+                  onChange={(e) => updateProject(index, "title", e.target.value)}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+                />
+                <textarea
+                  value={project.description}
+                  onChange={(e) => updateProject(index, "description", e.target.value)}
+                  rows="3"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+                />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <input
+                    value={project.liveLink}
+                    onChange={(e) => updateProject(index, "liveLink", e.target.value)}
+                    placeholder="Live URL"
+                    className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+                  />
+                  <input
+                    value={project.githubLink}
+                    onChange={(e) => updateProject(index, "githubLink", e.target.value)}
+                    placeholder="GitHub URL"
+                    className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none ring-0"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={() => deleteProject(index)}
+                className="rounded-lg border border-red-500/40 px-3 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+              >
+                Delete
+              </button>
             </div>
-            <button
-              onClick={() => deleteProject(index)}
-              className="text-red-400 hover:text-red-600 ml-4"
-            >
-              Delete
-            </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      {/* Save Button */}
       <button
         onClick={handleSave}
-        className="mt-6 bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded font-semibold transition"
+        className="mt-6 rounded-lg bg-cyan-500 px-6 py-2 font-semibold text-slate-950 transition hover:bg-cyan-400"
       >
         Save Changes
       </button>

@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
 import profile from "../assets/profile.jpeg";
-import {
-  FaGithub,
-  FaLinkedin,
-  FaDownload,
-  FaArrowRight,
-} from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
+import { useContent } from "../context/ContentContext";
 
 const Home = () => {
+  const { content } = useContent();
+  const home = content.home;
+
   return (
     <section className="relative min-h-screen bg-slate-900 overflow-hidden flex items-center">
 
@@ -27,44 +26,25 @@ const Home = () => {
           <div>
 
             <span className="inline-block px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500 text-cyan-400 font-medium mb-6">
-              👋 Welcome To My Portfolio
+              {home.eyebrow}
             </span>
 
             <h2 className="text-2xl md:text-3xl text-gray-300 mb-3">
-              Hello, I'm
+              {home.greeting}
             </h2>
 
             <h1 className="text-5xl md:text-7xl font-extrabold leading-tight">
-
-              <span className="text-white">
-                Prathmesh
-              </span>
-
+              <span className="text-white">{home.name}</span>
               <br />
-
-              <span className="text-cyan-400">
-                Bhagwat
-              </span>
-
+              <span className="text-cyan-400">{home.surname}</span>
             </h1>
 
             <h3 className="text-xl md:text-2xl text-gray-300 mt-6 font-medium">
-              Computer Science Engineering Student
+              {home.role}
             </h3>
 
             <p className="mt-6 text-gray-400 text-lg leading-8 max-w-xl">
-
-              Passionate about developing modern web applications,
-              learning new technologies, and solving real-world
-              problems using
-
-              <span className="text-cyan-400 font-semibold">
-                {" "}React, Python, Java, Django,
-                Machine Learning
-              </span>
-
-              {" "}and modern frontend technologies.
-
+              {home.description}
             </p>
 
             {/* Buttons */}
@@ -75,7 +55,7 @@ const Home = () => {
                 to="/projects"
                 className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 px-7 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
               >
-                View Projects
+                {home.buttonText}
                 <FaArrowRight />
               </Link>
 

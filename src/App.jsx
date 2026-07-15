@@ -10,16 +10,16 @@ import Skills from "./pages/Skills";
 import Contact from "./pages/Contact";
 
 import AdminLogin, {
-  Dashboard,
   DashboardOverview,
-  HomeEditor,
-  AboutEditor,
-  ProjectsEditor,
-  SkillsEditor,
-  ContactEditor,
-  LinksEditor,
   ProtectedRoute,
 } from "./pages/Admin-Login-Page/AdminLogin";
+import Dashboard from "./pages/Admin-Login-Page/Dashboard";
+import HomeEditor from "./pages/Admin-Login-Page/HomeEditor";
+import AboutEditor from "./pages/Admin-Login-Page/AboutEditor";
+import ProjectsEditor from "./pages/Admin-Login-Page/ProjectsEditor";
+import SkillsEditor from "./pages/Admin-Login-Page/SkillsEditor";
+import ContactEditor from "./pages/Admin-Login-Page/ContactEditor";
+import LinksEditor from "./pages/Admin-Login-Page/LinkEditor";
 
 function App() {
   const location = useLocation();
