@@ -4,7 +4,8 @@ import { db, isFirebaseConfigured } from "../lib/firebase";
 
 const ContentContext = createContext(null);
 const STORAGE_KEY = "portfolio-content";
-const CONTENT_DOCUMENT = "portfolio-content/current";
+// Firestore path: collection "portfolio" → document "content".
+const CONTENT_DOCUMENT = "portfolio/content";
 
 const defaultContent = {
   home: {
@@ -120,12 +121,21 @@ export function ContentProvider({ children }) {
     const unsubscribe = onSnapshot(
       contentRef,
       (snapshot) => {
-        if (snapshot.exists()) {
+        const remoteData = snapshot.data();
+
+        // Seed a newly created (or empty) document with the portfolio's
+        // starter content. This runs only once because the next snapshot
+        // contains the fields written below.
+        if (!snapshot.exists() || Object.keys(remoteData ?? {}).length === 0) {
+          setDoc(contentRef, defaultContent)
+            .then(() => setSyncState("synced"))
+            .catch(() => setSyncState("offline"));
+        } else {
           // Keep references for unchanged sections. This prevents an update
           // saved from another device from resetting an unsaved form in the
           // current dashboard.
           setContent((previous) => {
-            const remoteContent = { ...defaultContent, ...snapshot.data() };
+            const remoteContent = { ...defaultContent, ...remoteData };
             let hasChanges = false;
             const nextContent = { ...previous };
 
