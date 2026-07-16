@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { LoginSchema } from "../../validation/LoginSchema";
+import { auth, isFirebaseConfigured } from "../../lib/firebase";
 
 export const adminSections = [
   { to: "/dashboard", label: "Home" },
@@ -60,10 +62,18 @@ function AdminLogin() {
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={LoginSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            localStorage.setItem("isAdmin", "true");
-            setSubmitting(false);
-            navigate("/dashboard", { replace: true });
+          onSubmit={async (values, { setFieldError, setSubmitting }) => {
+            try {
+              if (isFirebaseConfigured) {
+                await signInWithEmailAndPassword(auth, values.email, values.password);
+              }
+              localStorage.setItem("isAdmin", "true");
+              navigate("/dashboard", { replace: true });
+            } catch {
+              setFieldError("password", "Email or password is incorrect.");
+            } finally {
+              setSubmitting(false);
+            }
           }}
         >
           {({ errors, touched, isSubmitting }) => (

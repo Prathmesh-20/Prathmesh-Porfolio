@@ -11,8 +11,12 @@ import {
   FaSignOutAlt,
   FaUserShield,
 } from "react-icons/fa";
+import { useContent } from "../../context/ContentContext";
+import { signOut } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 
 const Dashboard = () => {
+  const { syncState, isCloudSyncEnabled } = useContent();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(true);
@@ -33,10 +37,16 @@ const Dashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("isAdmin");
-    setMobileMenuOpen(false);
-    navigate("/admin");
+  const logout = async () => {
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+    } finally {
+      localStorage.removeItem("isAdmin");
+      setMobileMenuOpen(false);
+      navigate("/admin");
+    }
   };
 
   const menu = [
@@ -120,6 +130,13 @@ const Dashboard = () => {
               <div className="min-w-0">
                 <h2 className="text-xl font-semibold text-white sm:text-2xl">Dashboard</h2>
                 <p className="text-sm text-slate-400">Edit your portfolio content and preview it instantly.</p>
+                <p className={`mt-1 text-xs ${syncState === "synced" ? "text-emerald-400" : "text-amber-300"}`}>
+                  {isCloudSyncEnabled
+                    ? syncState === "synced"
+                      ? "Cloud sync active — changes appear on every device."
+                      : "Cloud sync is unavailable — changes are saved on this device until it reconnects."
+                    : "Cloud sync needs Firebase setup — changes currently stay on this device."}
+                </p>
               </div>
 
               {isMobile && (

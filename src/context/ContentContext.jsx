@@ -1,7 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { db, isFirebaseConfigured } from "../lib/firebase";
 
 const ContentContext = createContext(null);
 const STORAGE_KEY = "portfolio-content";
+const CONTENT_DOCUMENT = "portfolio-content/current";
 
 const defaultContent = {
   home: {
@@ -102,18 +105,63 @@ const loadStoredContent = () => {
 
 export function ContentProvider({ children }) {
   const [content, setContent] = useState(loadStoredContent);
+  const [syncState, setSyncState] = useState(
+    isFirebaseConfigured ? "connecting" : "local"
+  );
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
   }, [content]);
 
+  useEffect(() => {
+    if (!db) return undefined;
+
+    const contentRef = doc(db, CONTENT_DOCUMENT);
+    const unsubscribe = onSnapshot(
+      contentRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          // Keep references for unchanged sections. This prevents an update
+          // saved from another device from resetting an unsaved form in the
+          // current dashboard.
+          setContent((previous) => {
+            const remoteContent = { ...defaultContent, ...snapshot.data() };
+            let hasChanges = false;
+            const nextContent = { ...previous };
+
+            Object.entries(remoteContent).forEach(([section, remoteValue]) => {
+              if (JSON.stringify(previous[section]) !== JSON.stringify(remoteValue)) {
+                nextContent[section] = remoteValue;
+                hasChanges = true;
+              }
+            });
+
+            return hasChanges ? nextContent : previous;
+          });
+        }
+        setSyncState("synced");
+      },
+      () => setSyncState("offline")
+    );
+
+    return unsubscribe;
+  }, []);
+
   const updateSection = (section, value) => {
     setContent((prev) => ({ ...prev, [section]: value }));
+
+    if (db) {
+      // merge: true means saves from different devices update only their
+      // section instead of replacing the other device's entire portfolio.
+      setDoc(doc(db, CONTENT_DOCUMENT), { [section]: value }, { merge: true })
+        .then(() => setSyncState("synced"))
+        .catch(() => setSyncState("offline"));
+    }
   };
 
   const value = useMemo(
-    () => ({ content, setContent, updateSection }),
-    [content]
+    () => ({ content, setContent, updateSection, syncState, isCloudSyncEnabled: isFirebaseConfigured }),
+    [content, syncState]
   );
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;
