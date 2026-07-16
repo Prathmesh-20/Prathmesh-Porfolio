@@ -109,6 +109,7 @@ export function ContentProvider({ children }) {
   const [syncState, setSyncState] = useState(
     isFirebaseConfigured ? "connecting" : "local"
   );
+  const [syncError, setSyncError] = useState("");
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
@@ -149,9 +150,13 @@ export function ContentProvider({ children }) {
             return hasChanges ? nextContent : previous;
           });
         }
+        setSyncError("");
         setSyncState("synced");
       },
-      () => setSyncState("offline")
+      (error) => {
+        setSyncError(error.code || "Unable to read Firestore data.");
+        setSyncState("offline");
+      }
     );
 
     return unsubscribe;
@@ -164,14 +169,20 @@ export function ContentProvider({ children }) {
       // merge: true means saves from different devices update only their
       // section instead of replacing the other device's entire portfolio.
       setDoc(doc(db, CONTENT_DOCUMENT), { [section]: value }, { merge: true })
-        .then(() => setSyncState("synced"))
-        .catch(() => setSyncState("offline"));
+        .then(() => {
+          setSyncError("");
+          setSyncState("synced");
+        })
+        .catch((error) => {
+          setSyncError(error.code || "Unable to save changes to Firestore.");
+          setSyncState("offline");
+        });
     }
   };
 
   const value = useMemo(
-    () => ({ content, setContent, updateSection, syncState, isCloudSyncEnabled: isFirebaseConfigured }),
-    [content, syncState]
+    () => ({ content, setContent, updateSection, syncState, syncError, isCloudSyncEnabled: isFirebaseConfigured }),
+    [content, syncError, syncState]
   );
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;

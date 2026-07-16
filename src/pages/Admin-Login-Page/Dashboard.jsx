@@ -16,7 +16,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 
 const Dashboard = () => {
-  const { syncState, isCloudSyncEnabled } = useContent();
+  const { syncState, syncError, isCloudSyncEnabled } = useContent();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(true);
@@ -137,6 +137,7 @@ const Dashboard = () => {
                       : "Cloud sync is unavailable — changes are saved on this device until it reconnects."
                     : "Cloud sync needs Firebase setup — changes currently stay on this device."}
                 </p>
+                {syncError && <p className="mt-1 text-xs text-red-400">Firebase error: {syncError}</p>}
               </div>
 
               {isMobile && (
