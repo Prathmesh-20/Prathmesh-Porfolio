@@ -156,7 +156,9 @@ function AdminLogin() {
                   marginTop: "6px",
                 }}
               >
-                No credentials required — enter anything to continue
+                {isFirebaseConfigured
+                  ? "Use the email and password created in Firebase Authentication."
+                  : "Firebase is not configured — enter any valid email and password to continue locally."}
               </p>
             </Form>
           )}

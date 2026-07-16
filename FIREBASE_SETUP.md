@@ -12,7 +12,7 @@ The dashboard now keeps portfolio content in Cloud Firestore. This is what makes
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /portfolio-content/current {
+    match /portfolio/content {
       allow read: if true;
       allow write: if request.auth != null;
     }
