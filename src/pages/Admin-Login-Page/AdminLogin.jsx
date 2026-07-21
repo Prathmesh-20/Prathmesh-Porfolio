@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Navigate, useNavigate } from "react-router-dom";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import { LoginSchema } from "../../validation/LoginSchema";
 import { auth, isFirebaseConfigured } from "../../lib/firebase";
 
 function AdminLogin() {
   const navigate = useNavigate();
-  const [isCheckingSession, setIsCheckingSession] = useState(() => Boolean(auth));
+  const [isCheckingSession, setIsCheckingSession] = useState(() =>
+    Boolean(auth),
+  );
 
   useEffect(() => {
     if (!auth) {
@@ -26,7 +32,12 @@ function AdminLogin() {
   }, [navigate]);
 
   if (isCheckingSession) {
-    return <div className="min-h-screen bg-slate-950" aria-label="Checking secure session" />;
+    return (
+      <div
+        className="min-h-screen bg-slate-950"
+        aria-label="Checking secure session"
+      />
+    );
   }
 
   return (
@@ -51,42 +62,80 @@ function AdminLogin() {
           boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
         }}
       >
-        <h2 style={{ fontSize: "28px", marginBottom: "8px", textAlign: "center" }}>
+        <h2
+          style={{ fontSize: "28px", marginBottom: "8px", textAlign: "center" }}
+        >
           Admin Login
         </h2>
-        <p style={{ color: "#94a3b8", textAlign: "center", marginBottom: "24px" }}>
+        <p
+          style={{
+            color: "#94a3b8",
+            textAlign: "center",
+            marginBottom: "24px",
+          }}
+        >
           Sign in to access the dashboard
         </p>
 
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={LoginSchema}
-          onSubmit={async (values, { setFieldError, setSubmitting }) => {
-            try {
-              if (!isFirebaseConfigured || !auth) {
-                setFieldError("email", "Secure login is unavailable because Firebase is not configured.");
-                return;
-              }
+         onSubmit={async (values, { setFieldError, setSubmitting }) => {
+  try {
+    console.log("Login button clicked");
 
-              const credential = await signInWithEmailAndPassword(auth, values.email, values.password);
-              const token = await credential.user.getIdTokenResult();
-              if (token.claims.admin !== true) {
-                await signOut(auth);
-                setFieldError("email", "This account is not authorized to access the dashboard.");
-                return;
-              }
-              navigate("/dashboard", { replace: true });
-            } catch {
-              setFieldError("password", "Email or password is incorrect.");
-            } finally {
-              setSubmitting(false);
-            }
-          }}
+    if (!isFirebaseConfigured || !auth) {
+      console.log("Firebase not configured");
+      setFieldError(
+        "email",
+        "Secure login is unavailable because Firebase is not configured."
+      );
+      return;
+    }
+
+    console.log("Trying Firebase login...");
+
+    const credential = await signInWithEmailAndPassword(
+      auth,
+      values.email,
+      values.password
+    );
+
+    console.log("Login successful", credential.user.email);
+
+   if (credential.user.email !== "bhagwatp853@gmail.com") {
+  await signOut(auth);
+  setFieldError(
+    "email",
+    "This account is not authorized to access the dashboard."
+  );
+  return;
+}
+
+    console.log("Navigating to dashboard...");
+    navigate("/dashboard", { replace: true });
+
+  } catch (error) {
+    console.log("Firebase Error:", error);
+    setFieldError("password", error.message);
+  } finally {
+    setSubmitting(false);
+  }
+}}
         >
           {({ errors, touched, isSubmitting }) => (
-            <Form style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <Form
+              style={{ display: "flex", flexDirection: "column", gap: "14px" }}
+            >
               <div>
-                <label htmlFor="email" style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
+                <label
+                  htmlFor="email"
+                  style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    color: "#cbd5e1",
+                  }}
+                >
                   Email
                 </label>
                 <Field
@@ -107,12 +156,23 @@ function AdminLogin() {
                 <ErrorMessage
                   name="email"
                   component="div"
-                  style={{ color: "#f87171", fontSize: "12px", marginTop: "6px" }}
+                  style={{
+                    color: "#f87171",
+                    fontSize: "12px",
+                    marginTop: "6px",
+                  }}
                 />
               </div>
 
               <div>
-                <label htmlFor="password" style={{ display: "block", marginBottom: "6px", color: "#cbd5e1" }}>
+                <label
+                  htmlFor="password"
+                  style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    color: "#cbd5e1",
+                  }}
+                >
                   Password
                 </label>
                 <Field
@@ -133,7 +193,11 @@ function AdminLogin() {
                 <ErrorMessage
                   name="password"
                   component="div"
-                  style={{ color: "#f87171", fontSize: "12px", marginTop: "6px" }}
+                  style={{
+                    color: "#f87171",
+                    fontSize: "12px",
+                    marginTop: "6px",
+                  }}
                 />
               </div>
 
@@ -184,22 +248,30 @@ export function ProtectedRoute({ children }) {
     }
 
     return onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!firebaseUser) {
-        setUser(null);
-        return;
-      }
+  if (!firebaseUser) {
+    setUser(null);
+    return;
+  }
 
-      try {
-        const token = await firebaseUser.getIdTokenResult();
-        setUser(token.claims.admin === true ? firebaseUser : null);
-      } catch {
-        setUser(null);
-      }
-    });
+  try {
+    if (firebaseUser.email === "bhagwatp853@gmail.com") {
+      setUser(firebaseUser);
+    } else {
+      setUser(null);
+    }
+  } catch {
+    setUser(null);
+  }
+});
   }, []);
 
   if (user === undefined) {
-    return <div className="min-h-screen bg-slate-950" aria-label="Checking secure session" />;
+    return (
+      <div
+        className="min-h-screen bg-slate-950"
+        aria-label="Checking secure session"
+      />
+    );
   }
 
   if (!user) {
