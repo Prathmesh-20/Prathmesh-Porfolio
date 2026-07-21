@@ -11,16 +11,13 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Firebase configuration is public client configuration, but it must be set in
+// the hosting environment before content can be shared between devices.
 const isFirebaseConfigured = Boolean(
-  firebaseConfig.apiKey &&
-  firebaseConfig.authDomain &&
-  firebaseConfig.projectId &&
-  firebaseConfig.appId
+  firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId && firebaseConfig.appId
 );
 
-const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
+const db = isFirebaseConfigured ? getFirestore(initializeApp(firebaseConfig)) : null;
+const auth = isFirebaseConfigured ? getAuth() : null;
 
-const db = app ? getFirestore(app) : null;
-const auth = app ? getAuth(app) : null;
-
-export { app, auth, db, isFirebaseConfigured };
+export { auth, db, isFirebaseConfigured };
