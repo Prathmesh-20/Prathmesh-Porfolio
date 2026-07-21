@@ -43,7 +43,6 @@ const Dashboard = () => {
         await signOut(auth);
       }
     } finally {
-      localStorage.removeItem("isAdmin");
       setMobileMenuOpen(false);
       navigate("/admin");
     }

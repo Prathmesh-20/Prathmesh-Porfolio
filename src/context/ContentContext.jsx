@@ -1,12 +1,17 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
-import { db, isFirebaseConfigured } from "../lib/firebase";
+import SecureLSModule from "secure-ls";
+import { auth, db, isFirebaseConfigured } from "../lib/firebase";
 
 const ContentContext = createContext(null);
 const STORAGE_KEY = "portfolio-content";
+
+// This encrypts the browser's local content cache. Authentication and write
+// permissions are still enforced by Firebase, not by browser storage.
+// secure-ls publishes a CommonJS wrapper, so its constructor is on `default`.
+const secureStorage = new SecureLSModule.default({ encodingType: "aes" });
 // Firestore path: collection "portfolio" → document "content".
 const CONTENT_DOCUMENT = "portfolio/content";
-
 const defaultContent = {
   home: {
     eyebrow: "👋 Welcome To My Portfolio",
@@ -86,22 +91,34 @@ const defaultContent = {
     { platform: "LinkedIn", url: "https://linkedin.com" },
   ],
 };
+console.log("defaultContent", defaultContent);
 
 const loadStoredContent = () => {
   if (typeof window === "undefined") {
     return defaultContent;
   }
 
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (!stored) {
-    return defaultContent;
+  try {
+    const stored = secureStorage.get(STORAGE_KEY);
+    if (stored && typeof stored === "object") {
+      return stored;
+    }
+  } catch {
+    // A previous version used unencrypted localStorage. Fall through to its
+    // one-time migration below.
   }
 
   try {
-    return JSON.parse(stored);
+    const legacyContent = JSON.parse(window.localStorage.getItem(STORAGE_KEY));
+    if (legacyContent && typeof legacyContent === "object") {
+      secureStorage.set(STORAGE_KEY, legacyContent);
+      return legacyContent;
+    }
   } catch {
-    return defaultContent;
+    // No legacy cache is available.
   }
+
+  return defaultContent;
 };
 
 export function ContentProvider({ children }) {
@@ -109,10 +126,11 @@ export function ContentProvider({ children }) {
   const [syncState, setSyncState] = useState(
     isFirebaseConfigured ? "connecting" : "local"
   );
+  // console.log("isFirebaseConfigured", isFirebaseConfigured);
   const [syncError, setSyncError] = useState("");
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+    secureStorage.set(STORAGE_KEY, content);
   }, [content]);
 
   useEffect(() => {
@@ -127,7 +145,7 @@ export function ContentProvider({ children }) {
         // Seed a newly created (or empty) document with the portfolio's
         // starter content. This runs only once because the next snapshot
         // contains the fields written below.
-        if (!snapshot.exists() || Object.keys(remoteData ?? {}).length === 0) {
+        if ((!snapshot.exists() || Object.keys(remoteData ?? {}).length === 0) && auth?.currentUser) {
           setDoc(contentRef, defaultContent)
             .then(() => setSyncState("synced"))
             .catch(() => setSyncState("offline"));
@@ -165,7 +183,7 @@ export function ContentProvider({ children }) {
   const updateSection = (section, value) => {
     setContent((prev) => ({ ...prev, [section]: value }));
 
-    if (db) {
+    if (db && auth?.currentUser) {
       // merge: true means saves from different devices update only their
       // section instead of replacing the other device's entire portfolio.
       setDoc(doc(db, CONTENT_DOCUMENT), { [section]: value }, { merge: true })
@@ -177,6 +195,9 @@ export function ContentProvider({ children }) {
           setSyncError(error.code || "Unable to save changes to Firestore.");
           setSyncState("offline");
         });
+    } else if (db) {
+      setSyncError("You must sign in before saving portfolio changes.");
+      setSyncState("offline");
     }
   };
 

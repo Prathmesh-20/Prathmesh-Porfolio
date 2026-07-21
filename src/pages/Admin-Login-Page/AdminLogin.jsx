@@ -1,34 +1,33 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Navigate, useNavigate } from "react-router-dom";
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { LoginSchema } from "../../validation/LoginSchema";
 import { auth, isFirebaseConfigured } from "../../lib/firebase";
 
-export const adminSections = [
-  { to: "/dashboard", label: "Home" },
-  { to: "/dashboard/home", label: "Home" },
-  { to: "/dashboard/about", label: "About" },
-  { to: "/dashboard/projects", label: "Projects" },
-  { to: "/dashboard/skills", label: "Skills" },
-  { to: "/dashboard/contact", label: "Contact" },
-];
-
-function EditorPage({ title }) {
-  return (
-    <div style={{ padding: "20px", background: "#111827", color: "white", borderRadius: "10px" }}>
-      <h3>{title}</h3>
-      <p>This section is ready for editing.</p>
-    </div>
-  );
-}
-
 function AdminLogin() {
   const navigate = useNavigate();
+  const [isCheckingSession, setIsCheckingSession] = useState(() => Boolean(auth));
 
   useEffect(() => {
-    localStorage.removeItem("isAdmin");
-  }, []);
+    if (!auth) {
+      return undefined;
+    }
+
+    return onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const token = await user.getIdTokenResult();
+        if (token.claims.admin === true) {
+          navigate("/dashboard", { replace: true });
+        }
+      }
+      setIsCheckingSession(false);
+    });
+  }, [navigate]);
+
+  if (isCheckingSession) {
+    return <div className="min-h-screen bg-slate-950" aria-label="Checking secure session" />;
+  }
 
   return (
     <div
@@ -64,10 +63,18 @@ function AdminLogin() {
           validationSchema={LoginSchema}
           onSubmit={async (values, { setFieldError, setSubmitting }) => {
             try {
-              if (isFirebaseConfigured) {
-                await signInWithEmailAndPassword(auth, values.email, values.password);
+              if (!isFirebaseConfigured || !auth) {
+                setFieldError("email", "Secure login is unavailable because Firebase is not configured.");
+                return;
               }
-              localStorage.setItem("isAdmin", "true");
+
+              const credential = await signInWithEmailAndPassword(auth, values.email, values.password);
+              const token = await credential.user.getIdTokenResult();
+              if (token.claims.admin !== true) {
+                await signOut(auth);
+                setFieldError("email", "This account is not authorized to access the dashboard.");
+                return;
+              }
               navigate("/dashboard", { replace: true });
             } catch {
               setFieldError("password", "Email or password is incorrect.");
@@ -168,17 +175,34 @@ function AdminLogin() {
   );
 }
 
-export function DashboardOverview() {
-  return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl shadow-cyan-500/10">
-      <h2 className="text-2xl font-semibold text-cyan-400">Dashboard Overview</h2>
-      <p className="mt-2 text-slate-400">Welcome to your admin dashboard. Select a section on the left to start editing your portfolio content.</p>
-    </div>
-  );
-}
-
 export function ProtectedRoute({ children }) {
-  if (localStorage.getItem("isAdmin") !== "true") {
+  const [user, setUser] = useState(() => (auth ? undefined : null));
+
+  useEffect(() => {
+    if (!auth) {
+      return undefined;
+    }
+
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        const token = await firebaseUser.getIdTokenResult();
+        setUser(token.claims.admin === true ? firebaseUser : null);
+      } catch {
+        setUser(null);
+      }
+    });
+  }, []);
+
+  if (user === undefined) {
+    return <div className="min-h-screen bg-slate-950" aria-label="Checking secure session" />;
+  }
+
+  if (!user) {
     return <Navigate to="/admin" replace />;
   }
 
